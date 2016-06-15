@@ -1,0 +1,31 @@
+{
+  "name": "atom-snakeskin",
+  "description": "Snakeskin language support in Atom",
+  "homepage": "https://github.com/SnakeskinTpl/atom-snakeskin",
+  "main": "index.js",
+  "license": "MIT",
+  "version": "0.1.0",
+  "author": {
+    "name": "kobezzza",
+    "email": "kobezzza@mail.ru",
+    "url": "https://github.com/kobezzza"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SnakeskinTpl/atom-snakeskin"
+  },
+  "bugs": {
+    "url": "https://github.com/SnakeskinTpl/atom-snakeskin/issues"
+  },
+  "engines": {
+    "atom": "*",
+    "node": ">= 0.10"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "keywords": [
+    "atom",
+    "snakeskin"
+  ]
+}
