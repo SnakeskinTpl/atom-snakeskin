@@ -1,6 +1,6 @@
 {
   "name": "atom-snakeskin",
-  "description": "Snakeskin language support in Atom",
+  "description": "Snakeskin language support in Atom.",
   "homepage": "https://github.com/SnakeskinTpl/atom-snakeskin",
   "main": "index.js",
   "license": "MIT",

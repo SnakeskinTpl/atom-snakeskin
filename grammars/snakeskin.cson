@@ -5,11 +5,31 @@ fileTypes: [
 
 name: "Snakeskin"
 patterns: [
+  {include: "#string-character-escape"}
   {include: "#comment"}
+  {include: "#classic"}
   {include: "#jade-like"}
 ]
 
 repository:
+  "classic":
+    patterns: [
+      {include: "#template-classic"}
+      {include: "#dir-exp-classic"}
+      {include: "#dir-exp-simple-classic"}
+      {include: "#dir-classic"}
+      {include: "#dir-exp-shorthands-classic"}
+      {include: "#include-classic"}
+      {include: "#whitespace-classic"}
+      {include: "#var-classic"}
+      {include: "#target-classic"}
+      {include: "#tag-classic"}
+      {include: "#tags-classic"}
+      {include: "#block-classic"}
+      {include: "#const-global-classic"}
+      {include: "#output-classic"}
+    ]
+
   "jade-like":
     patterns: [
       {include: "#template-jade-like-mult"}
@@ -19,8 +39,11 @@ repository:
       {include: "#target-jade-like-mult"}
       {include: "#var-jade-like-mult"}
       {include: "#tag-jade-like-mult"}
+      {include: "#tags-jade-like-mult"}
+      {include: "#block-jade-like-mult"}
       {include: "#dir-exp-shorthands-jade-like-mult"}
       {include: "#const-global-jade-like-mult"}
+      {include: "#output-jade-like-mult"}
       {include: "#template-jade-like"}
       {include: "#dir-exp-jade-like"}
       {include: "#dir-exp-simple-jade-like"}
@@ -28,10 +51,13 @@ repository:
       {include: "#target-jade-like"}
       {include: "#var-jade-like"}
       {include: "#tag-jade-like"}
+      {include: "#tags-jade-like"}
+      {include: "#block-jade-like"}
       {include: "#dir-jade-like"}
       {include: "#dir-exp-shorthands-jade-like"}
       {include: "#whitespace-jade-like"}
       {include: "#const-global-jade-like"}
+      {include: "#output-jade-like"}
     ]
 
   "template-jade-like-mult":
@@ -67,27 +93,114 @@ repository:
       "4":
         patterns: [{include: "#template-body"}]
 
+  "template-classic":
+    begin: "(#?\\{)\\s*(async\\s+)?(template|interface|placeholder)\\s+"
+    beginCaptures:
+      "1":
+        name: "keyword.others.ss"
+      "2":
+        name: "storage.modifier.ss"
+      "3":
+        name: "storage.type.function.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#template-body"}]
+
   "template-body":
-    match: "^\\s*(?:([^(]+)\\s*(\\(.*?\\)))?(?:\\s*\\b(extends)\\s+(.*?)(?=@=|$))?(?:\\s*@=\\s+([^\\s]+)\\s+([^\\s]+)?)*"
-    patterns: [{include: "#expression"}]
+    patterns: [
+      {
+        match: "([^(]+)\\s*(\\(.*?\\))(?:\\s+(extends)\\s+(.*?))?(?=@=|\\s*}?$)"
+        captures:
+          "1":
+            name: "entity.name.function.ss"
+            patterns: [{include: "#expression"}]
+          "2":
+            patterns: [{include: "#expression"}]
+          "3":
+            name: "keyword.other.ss"
+          "4":
+            name: "entity.name.function.ss"
+            patterns: [{include: "#expression"}]
+      }
+      {
+        match: "@=\\s+([^\\s]+)\\s+(.*?)(?=@=|\\s*}?$)"
+        captures:
+          "1":
+            name: "storage.modifier.ss"
+          "2":
+            patterns: [{include: "#expression"}]
+      }
+      {
+        include: "#expression"
+      }
+    ]
+
+  "block-jade-like-mult":
+    begin: "^\\s*(#|-)\\s+(block)\\s+(.*?\\s+)?(&)[\\r\\n]"
+    beginCaptures:
+      "1":
+        name: "keyword.operator.ss"
+      "2":
+        name: "storage.type.function.ss"
+      "3":
+        patterns: [{include: "#block-body"}]
+      "4":
+        name: "keyword.operator.ss"
+
+    end: "\\s+(\\.)(?:[\\r\\n]|$)"
+    endCaptures:
+      "1":
+        name: "keyword.operator.ss"
+
+    patterns: [{include: "#block-body"}]
+
+  "block-jade-like":
+    match: "^\\s*(#|-)\\s+(block)\\s+(.*)"
     captures:
       "1":
-        name: "entity.name.function.ss"
-        patterns: [{include: "#expression"}]
+        name: "keyword.operator.ss"
       "2":
-        patterns: [{include: "#expression"}]
+        name: "storage.type.function.ss"
       "3":
-        name: "keyword.other.ss"
-      "4":
-        name: "entity.name.function.ss"
-        patterns: [{include: "#expression"}]
-      "5":
-        name: "storage.modifier.ss"
-      "6":
-        patterns: [{include: "#expression"}]
+        patterns: [{include: "#block-body"}]
+
+  "block-classic":
+    begin: "(#?\\{)\\s*(block)\\s+"
+    beginCaptures:
+      "1":
+        name: "keyword.others.ss"
+      "2":
+        name: "storage.type.function.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#block-body"}]
+
+  "block-body":
+    patterns: [
+      {
+        match: "([^(]+)\\s*(\\(.*?\\))(?=\\s*}?$)"
+        captures:
+          "1":
+            name: "entity.name.function.ss"
+            patterns: [{include: "#expression"}]
+          "2":
+            patterns: [{include: "#expression"}]
+      }
+      {
+        include: "#expression"
+      }
+    ]
 
   "dir-exp-jade-like-mult":
-    begin: "^\\s*(#|-)\\s+(namespace|import|decorator|final|func|return|catch|yield|await|void|call|output|forEach|forIn|for|while|do|throw|with|switch|case|if|unless|else(?:\\s+(?:if|unless)?))\\s+(.*?\\s+)?(&)[\\r\\n]"
+    begin: "^\\s*(#|-)\\s+(namespace|import|decorator|final|func|return|catch|yield|await|void|call|forEach|forIn|for|while|do|throw|with|switch|case|if|unless|else(?:\\s+(?:if|unless)?))\\s+(.*?\\s+)?(&)[\\r\\n]"
     beginCaptures:
       "1":
         name: "keyword.operator.ss"
@@ -106,7 +219,7 @@ repository:
     patterns: [{include: "#expression"}]
 
   "dir-exp-jade-like":
-    match: "^\\s*(#|-)\\s+(namespace|import|decorator|final|func|return|catch|yield|await|void|call|output|forEach|forIn|for|while|do|throw|with|switch|case|if|unless|else(?:\\s+(?:if|unless)?))\\s+(.*)"
+    match: "^\\s*(#|-)\\s+(namespace|import|decorator|putIn|final|func|return|catch|yield|await|void|call|forEach|forIn|for|while|do|throw|with|switch|case|if|unless|else(?:\\s+(?:if|unless)?))\\s+(.*)"
     captures:
       "1":
         name: "keyword.operator.ss"
@@ -115,7 +228,21 @@ repository:
       "3":
         patterns: [{include: "#expression"}]
 
+  "dir-exp-classic":
+    begin: "#?\\{\\s*(namespace|import|decorator|putIn|final|func|return|catch|yield|await|void|call|forEach|forIn|for|while|do|throw|with|switch|case|if|unless|else(?:\\s+(if|unless)?))\\s+"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "\\/?}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#expression"}]
+
   "dir-exp-simple-jade-like-mult":
+    name: "storage.modifier.ss"
     begin: "^\\s*(#|-)\\s+(doctype)\\s+(.*?\\s+)?(&)[\\r\\n]"
     beginCaptures:
       "1":
@@ -132,8 +259,6 @@ repository:
       "1":
         name: "keyword.operator.ss"
 
-    patterns: [{name: "storage.modifier.ss"}]
-
   "dir-exp-simple-jade-like":
     match: "^\\s*(#|-)\\s+(doctype)\\s+(.*)"
     captures:
@@ -144,6 +269,18 @@ repository:
       "3":
         name: "storage.modifier.ss"
 
+  "dir-exp-simple-classic":
+    name: "storage.modifier.ss"
+    begin: "#?\\{\\s*(doctype|end|\\/)\\s*"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
   "dir-jade-like":
     match: "^\\s*(#|-)\\s+(eval|head|ignoreWhitespaces|ignoreAllWhitespaces|unIgnoreAllWhitespaces|sp|op|super|break|continue|default|series|parallel|waterfall|try|finally)"
     captures:
@@ -152,11 +289,19 @@ repository:
       "2":
         name: "keyword.others.ss"
 
+  "dir-classic":
+    name: "keyword.others.ss"
+    match: "#?\\{\\s*(eval|head|ignoreWhitespaces|ignoreAllWhitespaces|unIgnoreAllWhitespaces|sp|op|super|break|continue|default|series|parallel|waterfall|try|finally)\\s*}"
+
   "whitespace-jade-like":
     match: "^\\s*(&(?:\\+|-)?|\\\\)"
     captures:
       "1":
         name: "keyword.operator.ss"
+
+  "whitespace-classic":
+    name: "keyword.others.ss"
+    match: "#?\\{\\s*(&(?:\\+|-)?|\\\\)\\s*}"
 
   "dir-exp-shorthands-jade-like-mult":
     begin: "^\\s*(>|\\?|\\(\\)|\\+=)\\s+(.*?\\s+)?(&)[\\r\\n]"
@@ -176,15 +321,28 @@ repository:
     patterns: [{include: "#expression"}]
 
   "dir-exp-shorthands-jade-like":
-    match: "^\\s*(>|\\?|\\(\\)|\\+=)\\s+(.*)"
+    match: "^\\s*(>|\\?|\\(\\)|\\+=|\\*)\\s+(.*)"
     captures:
       "1":
         name: "keyword.operator.ss"
       "2":
         patterns: [{include: "#expression"}]
 
+  "dir-exp-shorthands-classic":
+    begin: "#?\\{\\s*(>|\\?|\\(\\)|\\+=|\\*)\\s*"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "\\/?}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#expression"}]
+
   "const-global-jade-like-mult":
-    begin: "^\\s*(#|-)\\s+((?:const|global)\\s+)?(?:(.*?)\\s+)?(&)[\\r\\n]"
+    begin: "^\\s*(#|-)\\s+((?:const|global)\\s+)?(?:(.*?[^<>=~^!+\\-*/%|]=[^<>=~^!+\\-*/%|].*?)\\s+)?(&)[\\r\\n]"
     beginCaptures:
       "1":
         name: "keyword.operator.ss"
@@ -203,7 +361,7 @@ repository:
     patterns: [{include: "#var-single-variable"}]
 
   "const-global-jade-like":
-    match: "^\\s*(#|-)\\s+((?:const|global)\\s+)?(.*)"
+    match: "^\\s*(#|-)\\s+((?:const|global)\\s+)?(.*?[^<>=~^!+\\-*/%|]=[^<>=~^!+\\-*/%|].*)"
     captures:
       "1":
         name: "keyword.operator.ss"
@@ -211,6 +369,61 @@ repository:
         name: "keyword.others.ss"
       "3":
         patterns: [{include: "#var-single-variable"}]
+
+  "const-global-classic":
+    begin: "#?\\{\\s*((const|global)\\s+)?(?=.*?[^<>=~^!+\\-*/%|]=[^<>=~^!+\\-*/%|])"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#var-single-variable"}]
+
+  "output-jade-like-mult":
+    begin: "^\\s*(#|-)\\s+(output\\s+)?(.*?\\s+)?(&)[\\r\\n]"
+    beginCaptures:
+      "1":
+        name: "keyword.operator.ss"
+      "2":
+        name: "keyword.others.ss"
+      "3":
+        patterns: [{include: "#var-single-variable"}]
+      "4":
+        name: "keyword.operator.ss"
+
+    end: "\\s+(\\.)(?:[\\r\\n]|$)"
+    endCaptures:
+      "1":
+        name: "keyword.operator.ss"
+
+    patterns: [{include: "#expression"}]
+
+  "output-jade-like":
+    match: "^\\s*(#|-)\\s+(output\\s+)?(.*)"
+    captures:
+      "1":
+        name: "keyword.operator.ss"
+      "2":
+        name: "keyword.others.ss"
+      "3":
+        patterns: [{include: "#expression"}]
+
+  "output-classic":
+    begin: "#?\\{\\s*(output\\s+)?"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#expression"}]
 
   "var-jade-like-mult":
     begin: "^\\s*(?:(#|-)\\s+(var)|(:))\\s+(?:(.*?)\\s+)?(&)[\\r\\n]"
@@ -245,13 +458,29 @@ repository:
       "4":
         patterns: [{include: "#var-body"}]
 
+  "var-classic":
+    begin: "#?\\{\\s*(var\\s+|:)"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "\\/?}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#var-body"}]
+
   "var-body":
-    match: "^\\s*(putIn\\s+)?(.*)"
-    captures:
-      "1":
+    patterns: [
+      {
         name: "storage.modifier.ss"
-      "2":
-        patterns: [{include: "#var-single-variable"}]
+        matches: "\\bputIn\\s+(?=[^=\\s])"
+      }
+      {
+        include: "#var-single-variable"
+      }
+    ]
 
   "include-jade-like-mult":
     begin: "^\\s*(#|-)\\s+(include)\\s+(?:(.*)\\s+)?(&)[\\r\\n]"
@@ -282,8 +511,21 @@ repository:
       "3":
         patterns: [{include: "#include-body"}]
 
+  "include-classic":
+    begin: "#?\\{\\s*include\\s+"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#include-body"}]
+
   "include-body":
-    match: "^\\s*(?:(.*?)\\s+(as)\\s+(.*)|(.*))?"
+    match: "(?:(.*?)\\s+(as)\\s+(.*?)|(.*?))(?=}?$)"
     captures:
       "1":
         patterns: [{include: "#expression"}]
@@ -323,8 +565,21 @@ repository:
       "3":
         patterns: [{include: "#target-body"}]
 
+  "target-classic":
+    begin: "#?\\{\\s*target\\s+"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#target-body"}]
+
   "target-body":
-    match: "^\\s*(?:(.*?)\\s+(as)\\s+(.*)|(.*))?"
+    match: "(?:(.*?)\\s+(as)\\s+(.*?)|(.*?))(?=}?$)"
     captures:
       "1":
         patterns: [{include: "#expression"}]
@@ -336,7 +591,7 @@ repository:
         patterns: [{include: "#expression"}]
 
   "tag-jade-like-mult":
-    begin: "^\\s*(?:(#|-)\\s+(tag)|(<))\\s+(?:(.*)\\s+)?(&)[\\r\\n]"
+    begin: "^\\s*(?:(#|-)\\s+(tag)|(<))\\s+(?:([\\w:\\-]*)(.*)\\s+)?(&)[\\r\\n]"
     beginCaptures:
       "1":
         name: "keyword.operator.ss"
@@ -345,8 +600,11 @@ repository:
       "3":
         name: "keyword.operator.ss"
       "4":
-        patterns: [{include: "#tag-body"}]
+        name: "entity.name.tag.other.ss"
+        patterns: [{include: "#interpolation"}]
       "5":
+        patterns: [{include: "#tag-body"}]
+      "6":
         name: "keyword.operator.ss"
 
     end: "\\s+(\\.)(?:[\\r\\n]|$)"
@@ -357,7 +615,7 @@ repository:
     patterns: [{include: "#tag-body"}]
 
   "tag-jade-like":
-    match: "^\\s*(?:(#|-)\\s+(tag)|(<))\\s+(.*)"
+    match: "^\\s*(?:(#|-)\\s+(tag)|(<))\\s+([\\w:\\-]*)(.*)"
     captures:
       "1":
         name: "keyword.operator.ss"
@@ -366,31 +624,90 @@ repository:
       "3":
         name: "keyword.operator.ss"
       "4":
+        name: "entity.name.tag.other.ss"
+        patterns: [{include: "#interpolation"}]
+      "5":
         patterns: [{include: "#tag-body"}]
 
-  "tag-body":
-    match: "^\\s*([\\w:\\-]*)?(\\.[\\w:\\-]+)*(#[\\w:\\-]+)?(![\\w:\\-]+)*(.*)"
-    captures:
+  "tag-classic":
+    begin: "(#?\\{\\s*(?:tag\\s+|<))([\\w:\\-]*)"
+    beginCaptures:
       "1":
+        name: "keyword.others.ss"
+      "2":
         name: "entity.name.tag.other.ss"
         patterns: [{include: "#interpolation"}]
 
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#tag-body"}]
+
+  "tags-jade-like-mult":
+    begin: "^\\s*(#|-)\\s+(link|style|script|comment|attr)\\s+(?:(.*)\\s+)?(&)[\\r\\n]"
+    beginCaptures:
+      "1":
+        name: "keyword.operator.ss"
       "2":
-        name: "entity.other.attribute-name.ss"
-        patterns: [{include: "#interpolation"}]
-
+        name: "keyword.others.ss"
       "3":
-        name: "entity.other.attribute-name.id.ss"
-        patterns: [{include: "#interpolation"}]
-
+        patterns: [{include: "#tag-body"}]
       "4":
-        name: "keyword.other.ss"
+        name: "keyword.operator.ss"
 
-      "5":
-        patterns: [
-          {include: "#interpolation"}
-          {include: "#attr"}
-        ]
+    end: "\\s+(\\.)(?:[\\r\\n]|$)"
+    endCaptures:
+      "1":
+        name: "keyword.operator.ss"
+
+    patterns: [{include: "#tag-body"}]
+
+  "tags-jade-like":
+    match: "^\\s*(#|-)\\s+(link|style|script|comment|attr)\\s+(.*)"
+    captures:
+      "1":
+        name: "keyword.operator.ss"
+      "2":
+        name: "keyword.others.ss"
+      "3":
+        patterns: [{include: "#tag-body"}]
+
+  "tags-classic":
+    begin: "#?\\{\\s*(link|style|script|comment|attr)\\s+"
+    beginCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    end: "}"
+    endCaptures:
+      "0":
+        name: "keyword.others.ss"
+
+    patterns: [{include: "#tag-body"}]
+
+  "tag-body":
+    patterns: [
+      {
+        include: "#interpolation"
+      }
+      {
+        name: "entity.other.attribute-name.ss"
+        match: "\\[?\\.[\\w:\\-&]*\\]?"
+      }
+      {
+        name: "entity.other.attribute-name.id.ss"
+        match: "#[\\w:\\-]*"
+      }
+      {
+        name: "keyword.other.ss"
+        match: "![\\w:\\-]*"
+      }
+      {
+        include: "#attr"
+      }
+    ]
 
   "attr":
     name: "keyword.operator.ss"
@@ -409,7 +726,7 @@ repository:
       "0":
         name: "keyword.others.ss"
 
-    end: "\\}"
+    end: "}"
     endCaptures:
       "0":
         name: "keyword.others.ss"
@@ -428,6 +745,7 @@ repository:
       {include: "#import-operator"}
       {include: "#expression-operator"}
       {include: "#ss-operator"}
+      {include: "#placeholder-operator"}
       {include: "#relational-operator"}
       {include: "#arithmetic-operator"}
       {include: "#logic-operator"}
@@ -464,7 +782,7 @@ repository:
       "1":
         name: "variable.ss"
 
-    end: "(?=$|[;,])"
+    end: "(?=}?$|[;,])"
     patterns: [{include: "#expression"}]
 
   "await-modifier":
@@ -504,6 +822,10 @@ repository:
   "filter-operator":
     name: "keyword.other.ss"
     match: "\\|[!a-zA-Z_$][\\w$.]*"
+
+  "placeholder-operator":
+    name: "variable.ss"
+    match: "%(fileName|fileDir)%|\\b(TPL_NAME|PARENT_TPL_NAME|self|callee|$0|$_|$class|getTplResult|clearTplResult|arguments|exports)\\b"
 
   "import-operator":
     name: "keyword.control.import.include.ss"
@@ -549,7 +871,7 @@ repository:
       "0":
         name: "meta.brace.curly.ss"
 
-    end: "\\}"
+    end: "}"
     endCaptures:
       "0":
         name: "meta.brace.curly.ss"
@@ -562,7 +884,7 @@ repository:
   "object-member":
     name: "meta.object.member.ss"
     begin: "[a-zA-Z_$][\\w$]*\\s*:"
-    end: "(?=,|\\})"
+    end: "(?=,|})"
     patterns: [{include: "#expression"}]
 
   "literal":
