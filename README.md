@@ -3,8 +3,6 @@ atom-snakeskin
 
 Snakeskin language support in Atom.
 
-[![NPM version](http://img.shields.io/npm/v/atom-snakeskin.svg?style=flat)](http://badge.fury.io/js/atom-snakeskin)
-
 ## Install
 
 ```bash
