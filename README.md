@@ -3,6 +3,8 @@ atom-snakeskin
 
 Snakeskin language support in Atom.
 
+[![APM Version](https://img.shields.io/apm/v/atom-snakeskin.svg)](https://atom.io/packages/atom-snakeskin)
+
 ## Install
 
 ```bash
