@@ -9,6 +9,6 @@ Snakeskin language support in Atom.
 apm install atom-snakeskin
 ```
 
-## [License](https://github.com/SnakeskinTpl/snakeskin-loader/blob/master/LICENSE)
+## [License](https://github.com/SnakeskinTpl/atom-snakeskin/blob/master/LICENSE)
 
 The MIT License.
